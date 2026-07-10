@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { fetchTorrents, fetchTransferInfo, login } from './api'
 import { formatBytes, formatEta, formatSpeed } from './format'
 import { usePolling } from './usePolling'
-import { useFullscreenOnClick } from './useFullscreenOnClick'
+import { useFullscreen } from './useFullscreen'
 
 const POLL_INTERVAL_MS = 2000
 
@@ -14,7 +14,6 @@ const STAT_FIELDS = [
 ]
 
 function App() {
-  useFullscreenOnClick()
   const { data: transfer, error: transferError } = usePolling(fetchTransferInfo, POLL_INTERVAL_MS)
   const { data: torrents } = usePolling(fetchTorrents, POLL_INTERVAL_MS)
   const [focusedHash, setFocusedHash] = useState(null)
@@ -27,6 +26,7 @@ function App() {
 
   return (
     <div className="min-h-screen bg-black p-8 text-white">
+      <FullscreenButton />
       <Header
         transferSpeed={transfer?.dl_info_speed}
         selectedStat={selectedStatTorrent ? { torrent: selectedStatTorrent, key: selectedStat.key } : null}
@@ -39,6 +39,20 @@ function App() {
         onSelectStat={(hash, key) => setSelectedStat({ hash, key })}
       />
     </div>
+  )
+}
+
+function FullscreenButton() {
+  const { isFullscreen, toggle } = useFullscreen()
+
+  return (
+    <button
+      type="button"
+      onClick={toggle}
+      className="fixed top-4 right-4 border border-neutral-700 px-3 py-2 text-sm tracking-widest text-neutral-400 uppercase hover:border-white hover:text-white"
+    >
+      {isFullscreen ? 'Exit fullscreen' : 'Fullscreen'}
+    </button>
   )
 }
 
